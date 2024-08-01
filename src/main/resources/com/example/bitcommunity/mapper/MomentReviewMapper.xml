@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.bitcommunity.mapper.MomentReviewMapper">
+    <select id="selectDirectReview" resultType="com.example.bitcommunity.pojo.sql.MomentReviewForBrowse">
+        select
+            mr.mrid,
+            review,
+            likes,
+            mr.create_time,
+            mr.type,
+            mr.uid,
+            nickname,
+            avatar_url,
+            if(mrl.uid is not null, 1, 0) as is_liked
+        from
+            moment_review as mr
+                join
+            userinfo on mr.uid = userinfo.uid and mr.mid = #{mid} and mr.type = 0
+                left join
+            moment_review_likes as mrl on mr.mrid = mrl.mrid and mrl.uid=#{uid}
+        order by mr.create_time desc
+        limit #{offset}, #{limit};
+    </select>
+    <select id="selectDirectReviewNotLogin" resultType="com.example.bitcommunity.pojo.sql.MomentReviewForBrowse">
+        select
+            mr.mrid,
+            review,
+            likes,
+            mr.create_time,
+            mr.type,
+            mr.uid,
+            nickname,
+            avatar_url,
+            0 as is_liked
+        from
+            moment_review as mr
+                join
+            userinfo on mr.uid = userinfo.uid and mr.mid = #{mid} and mr.type = 0
+        order by mr.create_time desc
+        limit #{offset}, #{limit};
+    </select>
+    <select id="selectSubReview" resultType="com.example.bitcommunity.pojo.sql.MomentReviewForBrowse">
+        select
+            mr.mrid,
+            review,
+            likes,
+            mr.create_time,
+            mr.type,
+            mr.uid,
+            ui.nickname,
+            ui.avatar_url,
+            mr.to_uid,
+            sub_ui.nickname as to_nickname,
+            sub_ui.avatar_url as to_avatar_url,
+            if(mrl.uid is not null, 1, 0) as is_liked
+        from
+            moment_review as mr
+                join
+            userinfo as ui on mr.uid = ui.uid and mr.mid = #{mid} and mr.type != 0 and direct_mrid = #{mrid}
+                join
+            userinfo as sub_ui on mr.to_uid = sub_ui.uid
+                left join
+            moment_review_likes as mrl on mr.mrid = mrl.mrid and mrl.uid=#{uid}
+        order by mr.create_time desc
+        limit #{offset}, #{limit};
+    </select>
+    <select id="selectSubReviewNotLogin" resultType="com.example.bitcommunity.pojo.sql.MomentReviewForBrowse">
+        select
+            mr.mrid,
+            review,
+            likes,
+            mr.create_time,
+            mr.type,
+            mr.uid,
+            ui.nickname,
+            ui.avatar_url,
+            mr.to_uid,
+            sub_ui.nickname as to_nickname,
+            sub_ui.avatar_url as to_avatar_url,
+            0 as is_liked
+        from
+            moment_review as mr
+                join
+            userinfo as ui on mr.uid = ui.uid and mr.mid = #{mid} and mr.type != 0 and direct_mrid = #{mrid}
+                join
+            userinfo as sub_ui on mr.to_uid = sub_ui.uid
+        order by mr.create_time desc
+        limit #{offset}, #{limit};
+    </select>
+</mapper>

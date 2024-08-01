@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.bitcommunity.mapper.MomentMapper">
+    <select id="selectForBrowse" resultType="com.example.bitcommunity.pojo.sql.MomentForBrowse">
+        select
+            moment.mid,
+            title,
+            content,
+            moment.type,
+            cover_image_url,
+            likes,
+            moment.uid,
+            nickname,
+            avatar_url,
+            if(moment_likes.uid is not null, 1, 0) as is_liked
+        from
+        moment
+            join
+                userinfo on moment.uid = userinfo.uid and moment.is_deleted = 0
+            left join
+                moment_likes on moment.mid = moment_likes.mid and moment_likes.uid=#{uid}
+        order by moment.create_time desc
+        limit #{offset}, #{limit};
+    </select>
+    <select id="selectForBrowseNotLogin" resultType="com.example.bitcommunity.pojo.sql.MomentForBrowse">
+        select
+            moment.mid,
+            title,
+            content,
+            moment.type,
+            cover_image_url,
+            likes,
+            moment.uid,
+            nickname,
+            avatar_url,
+            0 as is_liked
+        from
+            moment
+                join
+            userinfo on moment.uid = userinfo.uid and moment.is_deleted = 0
+        order by moment.create_time desc
+        limit #{offset}, #{limit};
+    </select>
+    <select id="selectByMid" resultType="com.example.bitcommunity.pojo.sql.MomentForBrowse">
+        select
+            moment.mid,
+            title,
+            content,
+            cover_image_url,
+            moment.type,
+            imgs,
+            moment.create_time,
+            moment.update_time,
+            likes,
+            moment.uid,
+            nickname,
+            avatar_url,
+            if(moment_likes.uid is not null, 1, 0) as is_liked
+        from
+            moment
+                join
+            userinfo on moment.uid = userinfo.uid and moment.mid = #{mid} and moment.is_deleted = 0
+                left join
+            moment_likes on moment.mid = moment_likes.mid and moment_likes.uid=#{uid};
+    </select>
+    <select id="selectByMidNotLogin" resultType="com.example.bitcommunity.pojo.sql.MomentForBrowse">
+        select
+            moment.mid,
+            title,
+            content,
+            cover_image_url,
+            moment.type,
+            imgs,
+            moment.create_time,
+            moment.update_time,
+            likes,
+            moment.uid,
+            nickname,
+            avatar_url,
+            0 as is_liked
+        from
+            moment
+                join
+            userinfo on moment.uid = userinfo.uid and moment.mid = #{mid} and moment.is_deleted = 0;
+    </select>
+</mapper>
